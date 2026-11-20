@@ -13,7 +13,7 @@ export default function Hero({ onNavigate }) {
         <p className="hero__names">
           Ramesh <span className="weds">weds</span> Lakshmi Lavanya
           <span className="divider-dot">✦</span>
-          Seeshu <span className="weds">weds</span> Sravanthi
+          Seshu <span className="weds">weds</span> Sravanthi
         </p>
         <p className="hero__date">{eventDateLabel}</p>
         <p className="hero__venue">

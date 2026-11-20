@@ -14,7 +14,7 @@ export default function FamilyInvite() {
         <p className="invite__text">
           joyfully invite you to share in our happiness as our beloved twin sons,
         </p>
-        <p className="invite__couples">Ramesh &amp; Seeshu</p>
+        <p className="invite__couples">Ramesh &amp; Seshu</p>
         <p className="invite__text">
           are united in marriage with their brides, Lakshmi Lavanya and Sravanthi, on
         </p>

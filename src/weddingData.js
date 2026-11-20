@@ -10,11 +10,11 @@ export const couples = [
     tagline: 'Two hearts, written into one story by the stars.',
   },
   {
-    id: 'seeshu-sravanthi',
+    id: 'seshu-sravanthi',
     groom: 'Seshu',
     bride: 'Sravanthi',
     muhurtamTime: '9:34 PM',
-    photo: 'seeshu-sravanthi',
+    photo: 'seshu-sravanthi',
     tagline: 'A bond sealed with patience, blessed with love.',
   },
 ]

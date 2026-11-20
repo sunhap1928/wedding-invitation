@@ -1,9 +1,9 @@
 import rameshLavanya from '../assets/ramesh-lavanya.jpeg'
-import seeshuSravanthi from '../assets/seeshu-sravanthi.jpeg'
+import seshuSravanthi from '../assets/seshu-sravanthi.jpeg'
 
 const photos = [
   { src: rameshLavanya, caption: 'Ramesh & Lakshmi Lavanya' },
-  { src: seeshuSravanthi, caption: 'Seeshu & Sravanthi' },
+  { src: seshuSravanthi, caption: 'Seshu & Sravanthi' },
 ]
 
 export default function Gallery() {

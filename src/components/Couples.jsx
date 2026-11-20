@@ -1,10 +1,10 @@
 import rameshLavanya from '../assets/ramesh-lavanya.jpeg'
-import seeshuSravanthi from '../assets/seeshu-sravanthi.jpeg'
+import seshuSravanthi from '../assets/seshu-sravanthi.jpeg'
 import { couples, hosts } from '../weddingData'
 
 const photos = {
   'ramesh-lavanya': rameshLavanya,
-  'seeshu-sravanthi': seeshuSravanthi,
+  'seshu-sravanthi': seshuSravanthi,
 }
 
 export default function Couples() {
