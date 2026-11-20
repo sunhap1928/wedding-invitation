@@ -11,7 +11,7 @@ export const couples = [
   },
   {
     id: 'seeshu-sravanthi',
-    groom: 'Seeshu',
+    groom: 'Seshu',
     bride: 'Sravanthi',
     muhurtamTime: '9:34 PM',
     photo: 'seeshu-sravanthi',
@@ -48,7 +48,7 @@ export const schedule = [
   },
   {
     time: '9:34 PM',
-    title: 'Sacred Muhurtam — Seeshu & Sravanthi',
+    title: 'Sacred Muhurtam — Seshu & Sravanthi',
     detail: 'The auspicious moment of Saptapadi and Talambralu.',
   },
 ]
