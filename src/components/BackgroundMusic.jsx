@@ -43,28 +43,29 @@ export default function BackgroundMusic() {
     if (audio.readyState >= 1) tryAutoplay()
     else audio.addEventListener('loadedmetadata', tryAutoplay, { once: true })
 
-    // Regardless of whether autoplay worked, the first scroll, tap, click
-    // or keypress on the page reliably (re)starts playback unmuted — this
-    // is what actually works on browsers that block all unprompted audio.
-    const onFirstInteraction = () => {
-      startPlayback()
-      window.removeEventListener('scroll', onFirstInteraction)
-      window.removeEventListener('pointerdown', onFirstInteraction)
-      window.removeEventListener('touchstart', onFirstInteraction)
-      window.removeEventListener('keydown', onFirstInteraction)
+    // Regardless of whether autoplay worked, the first real interaction on
+    // the page reliably (re)starts playback unmuted. Browsers only grant
+    // the "user activation" audio needs to *completed* gestures — click,
+    // touchend, mouseup, keydown — not to scroll/touchstart/pointerdown,
+    // since those could just be the start of a scroll rather than a
+    // deliberate tap. iOS Safari is looser and also honors scroll, which
+    // this list still covers; Android Chrome requires one of the events
+    // below, so this is what makes it work there too.
+    const interactionEvents = ['click', 'touchend', 'mouseup', 'keydown', 'scroll']
+    const onFirstInteraction = (event) => {
+      // The toggle button already manages play/pause itself — don't let this
+      // generic "unlock audio" handler fight a deliberate pause click on it.
+      if (!event.target?.closest?.('.music-toggle')) startPlayback()
+      interactionEvents.forEach((type) => window.removeEventListener(type, onFirstInteraction))
     }
-    window.addEventListener('scroll', onFirstInteraction, { passive: true })
-    window.addEventListener('pointerdown', onFirstInteraction)
-    window.addEventListener('touchstart', onFirstInteraction, { passive: true })
-    window.addEventListener('keydown', onFirstInteraction)
+    interactionEvents.forEach((type) =>
+      window.addEventListener(type, onFirstInteraction, { passive: true }),
+    )
 
     return () => {
       audio.removeEventListener('loadedmetadata', seekToStart)
       audio.removeEventListener('loadedmetadata', tryAutoplay)
-      window.removeEventListener('scroll', onFirstInteraction)
-      window.removeEventListener('pointerdown', onFirstInteraction)
-      window.removeEventListener('touchstart', onFirstInteraction)
-      window.removeEventListener('keydown', onFirstInteraction)
+      interactionEvents.forEach((type) => window.removeEventListener(type, onFirstInteraction))
     }
   }, [])
 
