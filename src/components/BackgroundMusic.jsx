@@ -5,76 +5,75 @@ const START_AT = 16
 export default function BackgroundMusic() {
   const audioRef = useRef(null)
   const [playing, setPlaying] = useState(false)
-  const [muted, setMuted] = useState(false)
 
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    let cancelled = false
-    let unmuteAttached = false
 
-    function unmuteOnInteraction() {
-      audio.muted = false
-      setMuted(false)
-    }
-
-    function attachUnmuteListeners() {
-      if (unmuteAttached) return
-      unmuteAttached = true
-      window.addEventListener('pointerdown', unmuteOnInteraction, { once: true, capture: true })
-      window.addEventListener('keydown', unmuteOnInteraction, { once: true, capture: true })
-      window.addEventListener('scroll', unmuteOnInteraction, { once: true, capture: true })
-    }
-
-    async function attemptPlay() {
+    const seekToStart = () => {
       if (audio.currentTime < START_AT) audio.currentTime = START_AT
+    }
+    audio.addEventListener('loadedmetadata', seekToStart)
+
+    const startPlayback = () => {
+      audio.muted = false
+      const begin = () => {
+        seekToStart()
+        audio.play().then(() => setPlaying(true)).catch(() => {})
+      }
+      if (audio.readyState >= 1) begin()
+      else audio.addEventListener('loadedmetadata', begin, { once: true })
+    }
+
+    // Best-effort autoplay for browsers/engagement levels that allow it.
+    const tryAutoplay = async () => {
       try {
         await audio.play()
-        if (!cancelled) setPlaying(true)
+        setPlaying(true)
       } catch {
-        // Autoplay with sound was blocked — fall back to a muted autoplay,
-        // then unmute as soon as the visitor interacts with the page at all.
-        audio.muted = true
         try {
+          audio.muted = true
           await audio.play()
-          if (!cancelled) {
-            setPlaying(true)
-            setMuted(true)
-            attachUnmuteListeners()
-          }
+          setPlaying(true)
         } catch {
-          if (!cancelled) setPlaying(false)
+          // Blocked entirely — the interaction listeners below will start it.
         }
       }
     }
+    if (audio.readyState >= 1) tryAutoplay()
+    else audio.addEventListener('loadedmetadata', tryAutoplay, { once: true })
 
-    if (audio.readyState >= 1) {
-      attemptPlay()
-    } else {
-      audio.addEventListener('loadedmetadata', attemptPlay, { once: true })
+    // Regardless of whether autoplay worked, the first scroll, tap, click
+    // or keypress on the page reliably (re)starts playback unmuted — this
+    // is what actually works on browsers that block all unprompted audio.
+    const onFirstInteraction = () => {
+      startPlayback()
+      window.removeEventListener('scroll', onFirstInteraction)
+      window.removeEventListener('pointerdown', onFirstInteraction)
+      window.removeEventListener('touchstart', onFirstInteraction)
+      window.removeEventListener('keydown', onFirstInteraction)
     }
+    window.addEventListener('scroll', onFirstInteraction, { passive: true })
+    window.addEventListener('pointerdown', onFirstInteraction)
+    window.addEventListener('touchstart', onFirstInteraction, { passive: true })
+    window.addEventListener('keydown', onFirstInteraction)
 
     return () => {
-      cancelled = true
-      audio.removeEventListener('loadedmetadata', attemptPlay)
-      window.removeEventListener('pointerdown', unmuteOnInteraction, true)
-      window.removeEventListener('keydown', unmuteOnInteraction, true)
-      window.removeEventListener('scroll', unmuteOnInteraction, true)
+      audio.removeEventListener('loadedmetadata', seekToStart)
+      audio.removeEventListener('loadedmetadata', tryAutoplay)
+      window.removeEventListener('scroll', onFirstInteraction)
+      window.removeEventListener('pointerdown', onFirstInteraction)
+      window.removeEventListener('touchstart', onFirstInteraction)
+      window.removeEventListener('keydown', onFirstInteraction)
     }
   }, [])
 
   function toggle() {
     const audio = audioRef.current
     if (!audio) return
+    audio.muted = false
 
-    if (audio.muted) {
-      audio.muted = false
-      setMuted(false)
-      setPlaying(true)
-      return
-    }
-
-    if (playing) {
+    if (playing && !audio.paused) {
       audio.pause()
       setPlaying(false)
     } else {
@@ -89,8 +88,7 @@ export default function BackgroundMusic() {
       <button
         className={`music-toggle ${playing ? 'is-playing' : ''}`}
         onClick={toggle}
-        aria-label={muted ? 'Unmute background music' : playing ? 'Pause background music' : 'Play background music'}
-        title={muted ? 'Tap to unmute' : undefined}
+        aria-label={playing ? 'Pause background music' : 'Play background music'}
       >
         {playing ? '♪' : '♫'}
       </button>
