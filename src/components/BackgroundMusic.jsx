@@ -85,7 +85,7 @@ export default function BackgroundMusic() {
 
   return (
     <>
-      <audio ref={audioRef} src="/audio/kalyanam.mp3" loop preload="auto" />
+      <audio ref={audioRef} src={`${import.meta.env.BASE_URL}audio/kalyanam.mp3`} loop preload="auto" />
       <button
         className={`music-toggle ${playing ? 'is-playing' : ''}`}
         onClick={toggle}
